@@ -72,7 +72,11 @@ def _row_to_dict(headers, row):
     record = {}
     for i, header in enumerate(headers):
         if i < len(row):
-            record[header] = row[i]
+            val = row[i]
+            # Normalize Has Slate: 0/1 -> No/Yes
+            if header == "Has Slate":
+                val = "Yes" if val == "1" else "No"
+            record[header] = val
         else:
             record[header] = ""
     return record
@@ -116,7 +120,11 @@ def add_video(video_data):
     row = []
     for col in headers:
         if col in video_data:
-            row.append(str(video_data[col]))
+            val = str(video_data[col])
+            # Normalize Has Slate: Yes/No -> 1/0
+            if col == "Has Slate":
+                val = "1" if val == "Yes" else "0"
+            row.append(val)
         else:
             row.append("")
 
@@ -148,7 +156,11 @@ def update_video(video_id, video_data):
             # Extend row if needed
             while len(updated_row) <= col_idx:
                 updated_row.append("")
-            updated_row[col_idx] = str(value)
+            val = str(value)
+            # Normalize Has Slate: Yes/No -> 1/0 for spreadsheet
+            if col_name == "Has Slate":
+                val = "1" if val == "Yes" else "0"
+            updated_row[col_idx] = val
 
     # Batch update the entire row at once
     # Use the actual number of columns in the sheet to avoid clearing data

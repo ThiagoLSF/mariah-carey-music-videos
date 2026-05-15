@@ -263,7 +263,7 @@
             <select class="filter-select" id="filterYear" onchange="loadVideos()"><option value="">All Years</option></select>
             <div class="controls-right">
                 <span class="result-count">Showing <strong id="shownCount">0</strong> results</span>
-                <button class="btn btn-gold" id="addVideoBtn" onclick="openAddModal()">+ Add Video</button>
+                <!-- Add Video button removed - edit via spreadsheet only -->
             </div>
         </div>
         <div class="table-wrapper">
@@ -278,7 +278,6 @@
                         <th class="col-director" onclick="sortBy('Director')">Director <span class="sort-arrow">&#9650;</span></th>
                         <th class="col-date" onclick="sortBy('Release Date (US)')">Release Date <span class="sort-arrow">&#9650;</span></th>
                         <th class="col-main">Main</th>
-                        <th class="col-actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="videosTableBody"></tbody>
@@ -383,7 +382,7 @@
                 <div class="form-row">
                     <div class="form-group"><label>Has Slate</label>
                         <select id="formHasSlate">
-                            <option value="">No</option>
+                            <option value="No">No</option>
                             <option value="Yes">Yes</option>
                         </select>
                     </div>
@@ -555,12 +554,8 @@
                     '<td>' + esc(album) + '</td>' +
                     '<td>' + esc(director) + '</td>' +
                     '<td>' + esc(releaseDate) + '</td>' +
-                    '<td>' + (isMain ? '<span class="badge badge-main">Main</span> ' : '') + (isKey ? '<span class="badge badge-key">Key</span>' : '') + '</td>' +
-                    '<td><div class="actions-cell">' +
-                        '<button class="btn-icon" onclick="openEditModal(\'' + rowId + '\')" title="Edit">&#9998;</button>' +
-                        '<button class="btn-icon delete" onclick="deleteVideo(\'' + rowId + '\')" title="Delete">&#128465;</button>' +
-                    '</div></td></tr>' +
-                    '<tr class="detail-row" id="detailRow' + rowId + '"><td class="detail-cell" colspan="9"><div class="detail-panel"><div class="detail-grid">' + detailHtml + '</div></div></td></tr>';
+                    '<td>' + (isMain ? '<span class="badge badge-main">Main</span> ' : '') + (isKey ? '<span class="badge badge-key">Key</span>' : '') + '</td></tr>' +
+                    '<tr class="detail-row" id="detailRow' + rowId + '"><td class="detail-cell" colspan="8"><div class="detail-panel"><div class="detail-grid">' + detailHtml + '</div></div></td></tr>';
             }).join('');
         }
 
