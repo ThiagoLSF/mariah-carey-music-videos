@@ -155,6 +155,7 @@
         tr:last-child td { border-bottom: none; }
         .video-name { font-weight: 600; color: var(--gold-light); display: flex; align-items: center; gap: 0.5rem; }
         .video-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); flex-shrink: 0; }
+        .thumb-cell { width: 52px; text-align: center; vertical-align: middle; }
         .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 500; }
         .badge-type { background: rgba(212,168,83,0.1); border: 1px solid rgba(212,168,83,0.2); color: var(--gold); }
         .badge-category { background: rgba(100,180,255,0.1); border: 1px solid rgba(100,180,255,0.2); color: #7ab8ff; }
@@ -271,6 +272,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>Thumb</th>
                         <th onclick="sortBy('Name')">Name <span class="sort-arrow">&#9650;</span></th>
                         <th onclick="sortBy('Video Category')">Category <span class="sort-arrow">&#9650;</span></th>
                         <th onclick="sortBy('Album')">Album <span class="sort-arrow">&#9650;</span></th>
@@ -494,7 +496,7 @@
             const tbody = document.getElementById('videosTableBody');
             document.getElementById('shownCount').textContent = videos.length;
             if (videos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state"><div class="empty-icon">&#127925;</div><h3>No music videos found</h3><p>Try adjusting your search or filters, or add a new video!</p></div></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">&#127925;</div><h3>No music videos found</h3><p>Try adjusting your search or filters, or add a new video!</p></div></td></tr>';
                 return;
             }
             tbody.innerHTML = videos.map((v, idx) => {
@@ -550,7 +552,8 @@
                     return '<div class="detail-item"><span class="label">' + esc(f.label) + '</span><span class="value">' + val + '</span></div>';
                 }).join('');
                 return '<tr class="main-row" data-row="' + rowId + '">' +
-                    '<td class="video-name">' + thumbHtml + '<button class="expand-btn" onclick="toggleDetails(' + rowId + ')" id="expandBtn' + rowId + '" title="More details">+</button> ' + esc(name) + '</td>' +
+                    '<td class="thumb-cell">' + thumbHtml + '</td>' +
+                    '<td class="video-name"><button class="expand-btn" onclick="toggleDetails(' + rowId + ')" id="expandBtn' + rowId + '" title="More details">+</button> ' + esc(name) + '</td>' +
                     '<td>' + (videoCategory ? '<span class="badge badge-category">' + esc(videoCategory) + '</span>' : '-') + '</td>' +
                     '<td>' + esc(album) + '</td>' +
                     '<td>' + esc(director) + '</td>' +
@@ -561,7 +564,7 @@
                         '<button class="btn-icon edit-hidden" onclick="openEditModal(\'' + rowId + '\')" title="Edit">&#9998;</button>' +
                         '<button class="btn-icon delete edit-hidden" onclick="deleteVideo(\'' + rowId + '\')" title="Delete">&#128465;</button>' +
                     '</div></td></tr>' +
-                    '<tr class="detail-row" id="detailRow' + rowId + '"><td class="detail-cell" colspan="8"><div class="detail-panel"><div class="detail-grid">' + detailHtml + '</div></div></td></tr>';
+                    '<tr class="detail-row" id="detailRow' + rowId + '"><td class="detail-cell" colspan="9"><div class="detail-panel"><div class="detail-grid">' + detailHtml + '</div></div></td></tr>';
             }).join('');
         }
 
@@ -574,7 +577,7 @@
             else { currentSort.field = field; currentSort.order = 'asc'; }
             document.querySelectorAll('th').forEach(function(th) { th.classList.remove('active-sort'); });
             var headers = document.querySelectorAll('th');
-            var fieldMap = { 'Name': 0, 'Video Category': 1, 'Album': 2, 'Director': 3, 'Release Date (US)': 4, 'Has Slate': 5 };
+            var fieldMap = { 'Name': 1, 'Video Category': 2, 'Album': 3, 'Director': 4, 'Release Date (US)': 5, 'Has Slate': 6 };
             var idx = fieldMap[field];
             if (headers[idx]) {
                 headers[idx].classList.add('active-sort');
