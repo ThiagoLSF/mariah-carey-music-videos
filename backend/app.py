@@ -291,7 +291,9 @@ def serve_frontend():
 
 @app.route("/<path:path>")
 def serve_static(path):
-    """Serve static frontend files."""
+    """Serve static frontend files. Only match non-API paths."""
+    if path.startswith("api/"):
+        return jsonify({"error": "Not found"}), 404
     return send_from_directory(app.static_folder, path)
 
 
