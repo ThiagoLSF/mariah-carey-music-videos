@@ -57,6 +57,9 @@
         }
         .header .subtitle { font-size: 0.95rem; color: var(--text-muted); font-weight: 300; }
         .header .subtitle span { color: var(--gold); font-weight: 600; }
+        .header .credit { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; opacity: 0.6; }
+        .header .credit a { color: var(--text-muted); text-decoration: none; transition: var(--transition); }
+        .header .credit a:hover { color: var(--gold); opacity: 1; }
         .container { max-width: 1500px; margin: 0 auto; padding: 1.5rem 2rem; }
         .controls-bar {
             display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;
@@ -209,6 +212,7 @@
     <header class="header">
         <h1>✦ Mariah Carey</h1>
         <p class="subtitle">Music Videos Database — <span id="totalCount">0</span> videos</p>
+        <p class="credit">Developed by <a href="https://www.instagram.com/mariahstation/" target="_blank" rel="noopener">Mariah Station</a></p>
     </header>
     <div class="container">
         <div class="controls-bar">
