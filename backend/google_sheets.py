@@ -4,9 +4,16 @@ Handles reading from and writing to the Google Sheet.
 """
 
 import os
+import sys
 import json
 import gspread
 from google.oauth2.service_account import Credentials
+
+# Ensure backend directory is in path for imports
+_backend_dir = os.path.dirname(os.path.abspath(__file__))
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
+
 from config import SPREADSHEET_ID, SHEET_NAME, SCOPES, COLUMNS, API_KEY_FILE
 
 

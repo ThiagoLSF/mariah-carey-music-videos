@@ -5,9 +5,16 @@ Provides endpoints for searching, filtering, and managing music videos.
 
 import os
 import re
+import sys
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+
+# Ensure backend directory is in path for imports
+_backend_dir = os.path.dirname(os.path.abspath(__file__))
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
+
 from google_sheets import get_all_videos, get_video_by_id, add_video, update_video, delete_video
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), "..", "frontend"))
