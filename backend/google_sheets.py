@@ -88,9 +88,11 @@ def get_all_videos():
 
     headers = all_values[0]
     records = []
-    for row in all_values[1:]:
+    for i, row in enumerate(all_values[1:]):
         if any(cell.strip() for cell in row):  # Skip empty rows
-            records.append(_row_to_dict(headers, row))
+            record = _row_to_dict(headers, row)
+            record["_row"] = i + 1  # 1-based row index (excluding header)
+            records.append(record)
 
     return records
 

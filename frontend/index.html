@@ -60,16 +60,6 @@
         .header .credit { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; opacity: 0.6; }
         .header .credit a { color: var(--text-muted); text-decoration: none; transition: var(--transition); }
         .header .credit a:hover { color: var(--gold); opacity: 1; }
-        .header .lock-btn {
-            position: fixed; top: 1rem; right: 1.5rem; z-index: 100;
-            background: var(--dark-card); border: 1px solid var(--border); border-radius: 6px;
-            color: var(--text-muted); cursor: pointer; padding: 0.4rem 0.7rem;
-            font-size: 0.8rem; transition: var(--transition);
-            display: flex; align-items: center; gap: 0.35rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        .header .lock-btn:hover { border-color: var(--gold); color: var(--gold); }
-        .header .lock-btn.unlocked { border-color: var(--gold); color: var(--gold); background: rgba(212,168,83,0.1); }
         .password-modal-overlay {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1500;
@@ -259,7 +249,6 @@
         <h1>✦ Mariah Carey</h1>
         <p class="subtitle">Music Videos Database — <span id="totalCount">0</span> videos</p>
         <p class="credit">Developed by <a href="https://www.instagram.com/themariahstation/" target="_blank" rel="noopener">Mariah Station</a></p>
-        <button class="lock-btn" id="lockBtn" onclick="toggleLock()" title="Unlock to edit">🔒 <span>Locked</span></button>
     </header>
     <div class="container">
         <div class="controls-bar">
@@ -507,7 +496,7 @@
                 return;
             }
             tbody.innerHTML = videos.map((v, idx) => {
-                const rowId = idx + 1;
+                const rowId = v._row || (idx + 1);
                 const name = v.Name || '-';
                 const videoType = v['Video Type'] || '';
                 const videoCategory = v['Video Category'] || '';
@@ -594,50 +583,6 @@
             loadVideos();
         }
 
-        function openAddModal() {
-            document.getElementById('modalTitle').textContent = 'Add Music Video';
-            document.getElementById('editId').value = '';
-            clearForm();
-            document.getElementById('videoModal').classList.add('active');
-        }
-
-        async function openEditModal(id) {
-            document.getElementById('modalTitle').textContent = 'Edit Music Video';
-            document.getElementById('editId').value = id;
-            try {
-                var res = await fetch(API + '/videos/' + id);
-                var v = await res.json();
-                if (v.error) { showToast('Video not found', 'error'); return; }
-                document.getElementById('formName').value = v.Name || '';
-                document.getElementById('formDisplayName').value = v['Display Name'] || '';
-                document.getElementById('formVersionName').value = v['Version Name'] || '';
-                document.getElementById('formIntroName').value = v['Introduction Name'] || '';
-                document.getElementById('formAliases').value = v.Aliases || '';
-                document.getElementById('formVideoType').value = v['Video Type'] || '';
-                document.getElementById('formVideoCategory').value = v['Video Category'] || '';
-                document.getElementById('formUnreleased').value = v.Unreleased || '';
-                document.getElementById('formDirector').value = v.Director || '';
-                document.getElementById('formDP').value = v['Director of Photography'] || '';
-                document.getElementById('formProducer').value = v.Producer || '';
-                document.getElementById('formEditor').value = v.Editor || '';
-                document.getElementById('formAlbum').value = v.Album || '';
-                document.getElementById('formDuration').value = v['Duration (Seconds)'] || '';
-                document.getElementById('formPostProduction').value = v['Post Production'] || '';
-                document.getElementById('formReleaseDate').value = v['Release Date (US)'] || '';
-                document.getElementById('formReleaseAccuracy').value = v['Release Date Accuracy'] || '';
-                document.getElementById('formRecordDate').value = v['Record Date'] || '';
-                document.getElementById('formRecordLocation').value = v['Record Location'] || '';
-                document.getElementById('formISRC').value = v.ISRC || '';
-                document.getElementById('formIMDB').value = v.IMDB || '';
-                document.getElementById('formFinalReview').value = v['Final Review'] || '';
-                document.getElementById('formNote').value = v.Note || '';
-                document.getElementById('formHasSlate').value = v['Has Slate'] || '';
-                document.getElementById('formThumbnail').value = v['Thumbnail'] || '';
-                document.getElementById('thumbnailStatus').textContent = v['Thumbnail'] ? 'Current: ' + v['Thumbnail'] : '';
-                document.getElementById('videoModal').classList.add('active');
-            } catch (err) { showToast('Error loading video details', 'error'); }
-        }
-
         function closeModal() { document.getElementById('videoModal').classList.remove('active'); }
 
         function clearForm() {
@@ -717,17 +662,6 @@
             } catch (err) { showToast('Error: ' + err.message, 'error'); }
         }
 
-        async function deleteVideo(id) {
-            if (!confirm('Are you sure you want to delete this music video?')) return;
-            try {
-                var res = await fetch(API + '/videos/' + id, { method: 'DELETE' });
-                if (!res.ok) throw new Error('Failed to delete');
-                showToast('Video deleted!', 'success');
-                loadVideos();
-                loadFilterOptions();
-            } catch (err) { showToast('Error: ' + err.message, 'error'); }
-        }
-
         function showToast(msg, type) {
             var container = document.getElementById('toastContainer');
             var toast = document.createElement('div');
@@ -750,33 +684,27 @@
             if (e.key === 'Escape') closeModal();
         });
 
-        // Password protection for editing
+        // Password protection for editing - prompt only when trying to add/edit/delete
         const EDIT_PASSWORD = 'butiloveyouallthesame';
-        let isUnlocked = localStorage.getItem('mcUnlocked') === 'true';
+        let pendingAction = null;
 
-        function toggleLock() {
-            if (isUnlocked) {
-                // Lock it back
-                isUnlocked = false;
-                localStorage.removeItem('mcUnlocked');
-                updateLockUI();
-            } else {
-                // Show password modal
-                document.getElementById('passwordModal').classList.add('active');
-                document.getElementById('passwordInput').value = '';
-                document.getElementById('passwordError').classList.remove('show');
-                setTimeout(function() { document.getElementById('passwordInput').focus(); }, 100);
-            }
+        function requirePassword(actionFn) {
+            pendingAction = actionFn;
+            document.getElementById('passwordModal').classList.add('active');
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('passwordError').classList.remove('show');
+            setTimeout(function() { document.getElementById('passwordInput').focus(); }, 100);
         }
 
         function checkPassword() {
             var pwd = document.getElementById('passwordInput').value;
             if (pwd === EDIT_PASSWORD) {
-                isUnlocked = true;
-                localStorage.setItem('mcUnlocked', 'true');
                 document.getElementById('passwordModal').classList.remove('active');
-                updateLockUI();
-                showToast('Editing unlocked!', 'success');
+                document.getElementById('passwordError').classList.remove('show');
+                if (pendingAction) {
+                    pendingAction();
+                    pendingAction = null;
+                }
             } else {
                 document.getElementById('passwordError').classList.add('show');
                 document.getElementById('passwordInput').value = '';
@@ -787,27 +715,73 @@
         function closePasswordModal() {
             document.getElementById('passwordModal').classList.remove('active');
             document.getElementById('passwordError').classList.remove('show');
+            pendingAction = null;
         }
 
-        function updateLockUI() {
-            var btn = document.getElementById('lockBtn');
-            var elements = document.querySelectorAll('.edit-hidden');
-            if (isUnlocked) {
-                btn.classList.add('unlocked');
-                btn.title = 'Lock editing';
-                btn.innerHTML = '🔓 <span>Unlocked</span>';
-                elements.forEach(function(el) { el.classList.remove('edit-hidden'); });
-            } else {
-                btn.classList.remove('unlocked');
-                btn.title = 'Unlock to edit';
-                btn.innerHTML = '🔒 <span>Locked</span>';
-                elements.forEach(function(el) { el.classList.add('edit-hidden'); });
-            }
+        // Wrap add/edit/delete with password prompt
+        function openAddModal() {
+            requirePassword(function() {
+                document.getElementById('modalTitle').textContent = 'Add Music Video';
+                document.getElementById('editId').value = '';
+                clearForm();
+                document.getElementById('videoModal').classList.add('active');
+            });
+        }
+
+        function openEditModal(id) {
+            requirePassword(async function() {
+                document.getElementById('modalTitle').textContent = 'Edit Music Video';
+                document.getElementById('editId').value = id;
+                try {
+                    var res = await fetch(API + '/videos/' + id);
+                    var v = await res.json();
+                    if (v.error) { showToast('Video not found', 'error'); return; }
+                    document.getElementById('formName').value = v.Name || '';
+                    document.getElementById('formDisplayName').value = v['Display Name'] || '';
+                    document.getElementById('formVersionName').value = v['Version Name'] || '';
+                    document.getElementById('formIntroName').value = v['Introduction Name'] || '';
+                    document.getElementById('formAliases').value = v.Aliases || '';
+                    document.getElementById('formVideoType').value = v['Video Type'] || '';
+                    document.getElementById('formVideoCategory').value = v['Video Category'] || '';
+                    document.getElementById('formUnreleased').value = v.Unreleased || '';
+                    document.getElementById('formDirector').value = v.Director || '';
+                    document.getElementById('formDP').value = v['Director of Photography'] || '';
+                    document.getElementById('formProducer').value = v.Producer || '';
+                    document.getElementById('formEditor').value = v.Editor || '';
+                    document.getElementById('formAlbum').value = v.Album || '';
+                    document.getElementById('formDuration').value = v['Duration (Seconds)'] || '';
+                    document.getElementById('formPostProduction').value = v['Post Production'] || '';
+                    document.getElementById('formReleaseDate').value = v['Release Date (US)'] || '';
+                    document.getElementById('formReleaseAccuracy').value = v['Release Date Accuracy'] || '';
+                    document.getElementById('formRecordDate').value = v['Record Date'] || '';
+                    document.getElementById('formRecordLocation').value = v['Record Location'] || '';
+                    document.getElementById('formISRC').value = v.ISRC || '';
+                    document.getElementById('formIMDB').value = v.IMDB || '';
+                    document.getElementById('formFinalReview').value = v['Final Review'] || '';
+                    document.getElementById('formNote').value = v.Note || '';
+                    document.getElementById('formHasSlate').value = v['Has Slate'] || '';
+                    document.getElementById('formThumbnail').value = v['Thumbnail'] || '';
+                    document.getElementById('thumbnailStatus').textContent = v['Thumbnail'] ? 'Current: ' + v['Thumbnail'] : '';
+                    document.getElementById('videoModal').classList.add('active');
+                } catch (err) { showToast('Error loading video details', 'error'); }
+            });
+        }
+
+        function deleteVideo(id) {
+            requirePassword(async function() {
+                if (!confirm('Are you sure you want to delete this music video?')) return;
+                try {
+                    var res = await fetch(API + '/videos/' + id, { method: 'DELETE' });
+                    if (!res.ok) throw new Error('Failed to delete');
+                    showToast('Video deleted!', 'success');
+                    loadVideos();
+                    loadFilterOptions();
+                } catch (err) { showToast('Error: ' + err.message, 'error'); }
+            });
         }
 
         // Apply saved unlock state on page load
         document.addEventListener('DOMContentLoaded', function() {
-            if (isUnlocked) updateLockUI();
             loadVideos();
             loadFilterOptions();
         });
