@@ -278,6 +278,7 @@
                         <th class="col-director" onclick="sortBy('Director')">Director <span class="sort-arrow">&#9650;</span></th>
                         <th class="col-date" onclick="sortBy('Release Date (US)')">Release Date <span class="sort-arrow">&#9650;</span></th>
                         <th class="col-main">Main</th>
+                        <th class="col-released" onclick="sortBy('Unreleased')">Released <span class="sort-arrow">&#9650;</span></th>
                     </tr>
                 </thead>
                 <tbody id="videosTableBody"></tbody>
@@ -491,7 +492,7 @@
             const tbody = document.getElementById('videosTableBody');
             document.getElementById('shownCount').textContent = videos.length;
             if (videos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">&#127925;</div><h3>No music videos found</h3><p>Try adjusting your search or filters, or add a new video!</p></div></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">&#127925;</div><h3>No music videos found</h3><p>Try adjusting your search or filters, or add a new video!</p></div></td></tr>';
                 return;
             }
             tbody.innerHTML = videos.map((v, idx) => {
@@ -506,6 +507,7 @@
                 const isMain = v['Main Video'] === '1';
                 const isKey = v['Key Video'] === '1';
                 const hasSlate = v['Has Slate'] || '';
+                const isUnreleased = v.Unreleased === '1';
                 const thumbnail = v['Thumbnail'] || '';
                 // Thumbnail HTML
                 var thumbHtml = '';
@@ -553,8 +555,9 @@
                     '<td>' + esc(album) + '</td>' +
                     '<td>' + esc(director) + '</td>' +
                     '<td>' + esc(releaseDate) + '</td>' +
-                    '<td>' + (isMain ? '<span class="badge badge-main">Main</span> ' : '') + (isKey ? '<span class="badge badge-key">Key</span>' : '') + '</td></tr>' +
-                    '<tr class="detail-row" id="detailRow' + rowId + '"><td class="detail-cell" colspan="8"><div class="detail-panel"><div class="detail-grid">' + detailHtml + '</div></div></td></tr>';
+                    '<td>' + (isMain ? '<span class="badge badge-main">Main</span> ' : '') + (isKey ? '<span class="badge badge-key">Key</span>' : '') + '</td>' +
+                    '<td>' + (isUnreleased ? '<span class="badge badge-type">Unreleased</span>' : '<span class="badge badge-main">Released</span>') + '</td></tr>' +
+                    '<tr class="detail-row" id="detailRow' + rowId + '"><td class="detail-cell" colspan="9"><div class="detail-panel"><div class="detail-grid">' + detailHtml + '</div></div></td></tr>';
             }).join('');
         }
 
@@ -567,7 +570,7 @@
             else { currentSort.field = field; currentSort.order = 'asc'; }
             document.querySelectorAll('th').forEach(function(th) { th.classList.remove('active-sort'); });
             var headers = document.querySelectorAll('th');
-            var fieldMap = { 'Name': 1, 'Has Slate': 2, 'Video Category': 3, 'Album': 4, 'Director': 5, 'Release Date (US)': 6 };
+            var fieldMap = { 'Name': 1, 'Has Slate': 2, 'Video Category': 3, 'Album': 4, 'Director': 5, 'Release Date (US)': 6, 'Unreleased': 8 };
             var idx = fieldMap[field];
             if (headers[idx]) {
                 headers[idx].classList.add('active-sort');
