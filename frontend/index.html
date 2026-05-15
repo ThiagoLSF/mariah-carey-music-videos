@@ -556,7 +556,7 @@
                     '<td>' + esc(director) + '</td>' +
                     '<td>' + esc(releaseDate) + '</td>' +
                     '<td>' + (isMain ? '<span class="badge badge-main">Main</span> ' : '') + (isKey ? '<span class="badge badge-key">Key</span>' : '') + '</td>' +
-                    '<td>' + (isUnreleased ? '<span class="badge badge-type">Unreleased</span>' : '<span class="badge badge-main">Released</span>') + '</td></tr>' +
+                    '<td>' + (isUnreleased ? '<span class="badge badge-type">No</span>' : '<span class="badge badge-main">Yes</span>') + '</td></tr>' +
                     '<tr class="detail-row" id="detailRow' + rowId + '"><td class="detail-cell" colspan="9"><div class="detail-panel"><div class="detail-grid">' + detailHtml + '</div></div></td></tr>';
             }).join('');
         }
