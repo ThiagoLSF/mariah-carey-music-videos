@@ -20,34 +20,34 @@ SCOPES = [
 COLUMNS = [
     "Final Review",                    # 0
     "Name",                            # 1
-    "Key Artist",                      # 2
-    "Main Video",                      # 3
-    "Key Video",                       # 4
-    "Unreleased",                      # 5
-    "Version Name",                    # 6
-    "Introduction Name",               # 7
-    "Aliases",                         # 8
-    "Video Type",                      # 9
-    "Video Category",                  # 10
-    "Director",                        # 11
-    "Director of Photography",         # 12
-    "Producer",                        # 13
-    "Editor",                          # 14
-    "Post Production",                 # 15
-    "Release Date (US)",               # 16
-    "Release Date Accuracy",           # 17
-    "Release Date Estimated",          # 18
-    "Record Date",                     # 19
-    "Record Date Accuracy",            # 20
-    "Record Date Estimated",           # 21
-    "Record Location",                 # 22
-    "Duration (Seconds)",              # 23
-    "ISRC",                            # 24
-    "IMDB",                            # 25
-    "Note",                            # 26
-    "Album",                           # 27
-    "Has Slate",                       # 28
-    "Thumbnail",                       # 29
+    "Has Slate",                       # 2
+    "Key Artist",                      # 3
+    "Main Video",                      # 4
+    "Key Video",                       # 5
+    "Unreleased",                      # 6
+    "Version Name",                    # 7
+    "Introduction Name",               # 8
+    "Key Artist",                      # 9  (duplicate in spreadsheet)
+    "Aliases",                         # 10
+    "Video Type",                      # 11
+    "Video Category",                  # 12
+    "Director",                        # 13
+    "Director of Photography",         # 14
+    "Producer",                        # 15
+    "Editor",                          # 16
+    "Post Production (VFX, Color Grading etc)",  # 17
+    "Release Date (US)",               # 18
+    "Release Date Accuracy",           # 19
+    "Release Date Estimated",          # 20
+    "Record Date",                     # 21
+    "Record Date Accuracy",            # 22
+    "Record Date Estimated",           # 23
+    "Record Location",                 # 24
+    "Duration (Seconds)",              # 25
+    "ISRC",                            # 26
+    "IMDB",                            # 27
+    "Note",                            # 28
+    "Album",                           # 29
 ]
 
 # Columns to display in the frontend table

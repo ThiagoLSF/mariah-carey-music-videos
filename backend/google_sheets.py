@@ -112,9 +112,9 @@ def add_video(video_data):
     all_values = sheet.get_all_values()
     headers = all_values[0] if all_values else COLUMNS
 
-    # Build the row in column order
+    # Build the row using actual spreadsheet header order
     row = []
-    for col in COLUMNS:
+    for col in headers:
         if col in video_data:
             row.append(str(video_data[col]))
         else:
@@ -151,9 +151,9 @@ def update_video(video_id, video_data):
             updated_row[col_idx] = str(value)
 
     # Batch update the entire row at once
-    # Use gspread's 1-based (row, col) range format
-    end_col = len(updated_row)
-    # gspread's update accepts a list of lists with a cell_list or range
+    # Use the actual number of columns in the sheet to avoid clearing data
+    num_cols = len(all_values[0]) if all_values else len(updated_row)
+    end_col = max(len(updated_row), num_cols)
     cell_list = sheet.range(row_idx + 1, 1, row_idx + 1, end_col)
     for i, cell in enumerate(cell_list):
         cell.value = updated_row[i] if i < len(updated_row) else ""
