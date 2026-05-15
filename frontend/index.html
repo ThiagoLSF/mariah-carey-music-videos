@@ -272,12 +272,10 @@
                 <thead>
                     <tr>
                         <th onclick="sortBy('Name')">Name <span class="sort-arrow">&#9650;</span></th>
-                        <th onclick="sortBy('Video Type')">Type <span class="sort-arrow">&#9650;</span></th>
                         <th onclick="sortBy('Video Category')">Category <span class="sort-arrow">&#9650;</span></th>
                         <th onclick="sortBy('Album')">Album <span class="sort-arrow">&#9650;</span></th>
                         <th onclick="sortBy('Director')">Director <span class="sort-arrow">&#9650;</span></th>
                         <th onclick="sortBy('Release Date (US)')">Release Date <span class="sort-arrow">&#9650;</span></th>
-                        <th onclick="sortBy('Duration (Seconds)')">Duration <span class="sort-arrow">&#9650;</span></th>
                         <th onclick="sortBy('Has Slate')">Slate <span class="sort-arrow">&#9650;</span></th>
                         <th>Main</th>
                         <th class="edit-hidden">Actions</th>
@@ -553,19 +551,17 @@
                 }).join('');
                 return '<tr class="main-row" data-row="' + rowId + '">' +
                     '<td class="video-name">' + thumbHtml + '<button class="expand-btn" onclick="toggleDetails(' + rowId + ')" id="expandBtn' + rowId + '" title="More details">+</button> ' + esc(name) + '</td>' +
-                    '<td>' + (videoType ? '<span class="badge badge-type">' + esc(videoType) + '</span>' : '-') + '</td>' +
                     '<td>' + (videoCategory ? '<span class="badge badge-category">' + esc(videoCategory) + '</span>' : '-') + '</td>' +
                     '<td>' + esc(album) + '</td>' +
                     '<td>' + esc(director) + '</td>' +
                     '<td>' + esc(releaseDate) + '</td>' +
-                    '<td>' + duration + '</td>' +
                     '<td>' + (hasSlate === 'Yes' ? '<span class="badge badge-main">Yes</span>' : '<span class="badge badge-type" style="opacity:0.5">No</span>') + '</td>' +
                     '<td>' + (isMain ? '<span class="badge badge-main">Main</span> ' : '') + (isKey ? '<span class="badge badge-key">Key</span>' : '') + '</td>' +
                     '<td><div class="actions-cell">' +
                         '<button class="btn-icon edit-hidden" onclick="openEditModal(\'' + rowId + '\')" title="Edit">&#9998;</button>' +
                         '<button class="btn-icon delete edit-hidden" onclick="deleteVideo(\'' + rowId + '\')" title="Delete">&#128465;</button>' +
                     '</div></td></tr>' +
-                    '<tr class="detail-row" id="detailRow' + rowId + '"><td class="detail-cell" colspan="10"><div class="detail-panel"><div class="detail-grid">' + detailHtml + '</div></div></td></tr>';
+                    '<tr class="detail-row" id="detailRow' + rowId + '"><td class="detail-cell" colspan="8"><div class="detail-panel"><div class="detail-grid">' + detailHtml + '</div></div></td></tr>';
             }).join('');
         }
 
@@ -578,7 +574,7 @@
             else { currentSort.field = field; currentSort.order = 'asc'; }
             document.querySelectorAll('th').forEach(function(th) { th.classList.remove('active-sort'); });
             var headers = document.querySelectorAll('th');
-            var fieldMap = { 'Name': 0, 'Video Type': 1, 'Video Category': 2, 'Album': 3, 'Director': 4, 'Release Date (US)': 5, 'Duration (Seconds)': 6, 'Has Slate': 7 };
+            var fieldMap = { 'Name': 0, 'Video Category': 1, 'Album': 2, 'Director': 3, 'Release Date (US)': 4, 'Has Slate': 5 };
             var idx = fieldMap[field];
             if (headers[idx]) {
                 headers[idx].classList.add('active-sort');
