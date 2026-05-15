@@ -153,7 +153,7 @@
         td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
         tr:hover td { background: rgba(212,168,83,0.03); }
         tr:last-child td { border-bottom: none; }
-        .video-name { font-weight: 600; color: var(--gold-light); display: flex; align-items: center; gap: 0.5rem; }
+        .video-name { font-weight: 600; color: var(--gold-light); white-space: nowrap; }
         .video-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); flex-shrink: 0; }
         .thumb-cell { width: 52px; text-align: center; vertical-align: middle; }
         .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 500; }
@@ -274,11 +274,11 @@
                     <tr>
                         <th>Thumb</th>
                         <th onclick="sortBy('Name')">Name <span class="sort-arrow">&#9650;</span></th>
+                        <th onclick="sortBy('Has Slate')">Slate <span class="sort-arrow">&#9650;</span></th>
                         <th onclick="sortBy('Video Category')">Category <span class="sort-arrow">&#9650;</span></th>
                         <th onclick="sortBy('Album')">Album <span class="sort-arrow">&#9650;</span></th>
                         <th onclick="sortBy('Director')">Director <span class="sort-arrow">&#9650;</span></th>
                         <th onclick="sortBy('Release Date (US)')">Release Date <span class="sort-arrow">&#9650;</span></th>
-                        <th onclick="sortBy('Has Slate')">Slate <span class="sort-arrow">&#9650;</span></th>
                         <th>Main</th>
                         <th class="edit-hidden">Actions</th>
                     </tr>
@@ -554,11 +554,11 @@
                 return '<tr class="main-row" data-row="' + rowId + '">' +
                     '<td class="thumb-cell">' + thumbHtml + '</td>' +
                     '<td class="video-name"><button class="expand-btn" onclick="toggleDetails(' + rowId + ')" id="expandBtn' + rowId + '" title="More details">+</button> ' + esc(name) + '</td>' +
+                    '<td>' + (hasSlate === 'Yes' ? '<span class="badge badge-main">Yes</span>' : '<span class="badge badge-type" style="opacity:0.5">No</span>') + '</td>' +
                     '<td>' + (videoCategory ? '<span class="badge badge-category">' + esc(videoCategory) + '</span>' : '-') + '</td>' +
                     '<td>' + esc(album) + '</td>' +
                     '<td>' + esc(director) + '</td>' +
                     '<td>' + esc(releaseDate) + '</td>' +
-                    '<td>' + (hasSlate === 'Yes' ? '<span class="badge badge-main">Yes</span>' : '<span class="badge badge-type" style="opacity:0.5">No</span>') + '</td>' +
                     '<td>' + (isMain ? '<span class="badge badge-main">Main</span> ' : '') + (isKey ? '<span class="badge badge-key">Key</span>' : '') + '</td>' +
                     '<td><div class="actions-cell">' +
                         '<button class="btn-icon edit-hidden" onclick="openEditModal(\'' + rowId + '\')" title="Edit">&#9998;</button>' +
@@ -577,7 +577,7 @@
             else { currentSort.field = field; currentSort.order = 'asc'; }
             document.querySelectorAll('th').forEach(function(th) { th.classList.remove('active-sort'); });
             var headers = document.querySelectorAll('th');
-            var fieldMap = { 'Name': 1, 'Video Category': 2, 'Album': 3, 'Director': 4, 'Release Date (US)': 5, 'Has Slate': 6 };
+            var fieldMap = { 'Name': 1, 'Has Slate': 2, 'Video Category': 3, 'Album': 4, 'Director': 5, 'Release Date (US)': 6 };
             var idx = fieldMap[field];
             if (headers[idx]) {
                 headers[idx].classList.add('active-sort');
