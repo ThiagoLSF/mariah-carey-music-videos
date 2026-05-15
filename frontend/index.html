@@ -153,7 +153,8 @@
         td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
         tr:hover td { background: rgba(212,168,83,0.03); }
         tr:last-child td { border-bottom: none; }
-        .video-name { font-weight: 600; color: var(--gold-light); }
+        .video-name { font-weight: 600; color: var(--gold-light); display: flex; align-items: center; gap: 0.5rem; }
+        .video-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); flex-shrink: 0; }
         .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 500; }
         .badge-type { background: rgba(212,168,83,0.1); border: 1px solid rgba(212,168,83,0.2); color: var(--gold); }
         .badge-category { background: rgba(100,180,255,0.1); border: 1px solid rgba(100,180,255,0.2); color: #7ab8ff; }
@@ -277,6 +278,7 @@
                         <th onclick="sortBy('Director')">Director <span class="sort-arrow">&#9650;</span></th>
                         <th onclick="sortBy('Release Date (US)')">Release Date <span class="sort-arrow">&#9650;</span></th>
                         <th onclick="sortBy('Duration (Seconds)')">Duration <span class="sort-arrow">&#9650;</span></th>
+                        <th onclick="sortBy('Has Slate')">Slate <span class="sort-arrow">&#9650;</span></th>
                         <th>Main</th>
                         <th class="edit-hidden">Actions</th>
                     </tr>
@@ -380,6 +382,22 @@
                     <div class="form-group"><label>IMDB</label><input type="text" id="formIMDB" placeholder="e.g. tt7350038"></div>
                     <div class="form-group"><label>Final Review</label><input type="text" id="formFinalReview" placeholder="Review status"></div>
                 </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Has Slate</label>
+                        <select id="formHasSlate">
+                            <option value="">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Thumbnail Image</label>
+                        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+                            <input type="file" id="formThumbnailFile" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none">
+                            <input type="text" id="formThumbnail" placeholder="Filename (auto-filled on upload)" readonly style="flex:1;opacity:0.7">
+                            <button class="btn btn-outline" onclick="document.getElementById('formThumbnailFile').click()" style="font-size:0.78rem;padding:0.5rem 0.85rem">Choose</button>
+                            <span id="thumbnailStatus" style="font-size:0.75rem;color:var(--text-muted)"></span>
+                        </div>
+                    </div>
+                </div>
                 <div class="form-group"><label>Note</label><textarea id="formNote" placeholder="Any additional notes..."></textarea></div>
             </div>
             <div class="modal-footer">
@@ -478,7 +496,7 @@
             const tbody = document.getElementById('videosTableBody');
             document.getElementById('shownCount').textContent = videos.length;
             if (videos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">&#127925;</div><h3>No music videos found</h3><p>Try adjusting your search or filters, or add a new video!</p></div></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state"><div class="empty-icon">&#127925;</div><h3>No music videos found</h3><p>Try adjusting your search or filters, or add a new video!</p></div></td></tr>';
                 return;
             }
             tbody.innerHTML = videos.map((v, idx) => {
@@ -492,6 +510,13 @@
                 const duration = formatDuration(v['Duration (Seconds)']);
                 const isMain = v['Main Video'] === '1';
                 const isKey = v['Key Video'] === '1';
+                const hasSlate = v['Has Slate'] || '';
+                const thumbnail = v['Thumbnail'] || '';
+                // Thumbnail HTML
+                var thumbHtml = '';
+                if (thumbnail) {
+                    thumbHtml = '<img class="video-thumb" src="' + API + '/thumbnails/' + encodeURIComponent(thumbnail) + '" alt="' + esc(name) + '" loading="lazy" onerror="this.style.display=\'none\'"> ';
+                }
                 // Build detail panel fields (all columns)
                 var detailFields = [
                     { label: 'Name', value: v.Name },
@@ -519,26 +544,28 @@
                     { label: 'Key Artist', value: v['Key Artist'] },
                     { label: 'Main Video', value: isMain ? 'Yes' : 'No' },
                     { label: 'Key Video', value: isKey ? 'Yes' : 'No' },
-                    { label: 'Unreleased', value: v.Unreleased === '1' ? 'Yes' : 'No' }
+                    { label: 'Unreleased', value: v.Unreleased === '1' ? 'Yes' : 'No' },
+                    { label: 'Has Slate', value: hasSlate || 'No' }
                 ];
                 var detailHtml = detailFields.map(function(f) {
                     var val = f.value && f.value !== '-' ? esc(f.value) : '<span class="empty">—</span>';
                     return '<div class="detail-item"><span class="label">' + esc(f.label) + '</span><span class="value">' + val + '</span></div>';
                 }).join('');
                 return '<tr class="main-row" data-row="' + rowId + '">' +
-                    '<td class="video-name"><button class="expand-btn" onclick="toggleDetails(' + rowId + ')" id="expandBtn' + rowId + '" title="More details">+</button> ' + esc(name) + '</td>' +
+                    '<td class="video-name">' + thumbHtml + '<button class="expand-btn" onclick="toggleDetails(' + rowId + ')" id="expandBtn' + rowId + '" title="More details">+</button> ' + esc(name) + '</td>' +
                     '<td>' + (videoType ? '<span class="badge badge-type">' + esc(videoType) + '</span>' : '-') + '</td>' +
                     '<td>' + (videoCategory ? '<span class="badge badge-category">' + esc(videoCategory) + '</span>' : '-') + '</td>' +
                     '<td>' + esc(album) + '</td>' +
                     '<td>' + esc(director) + '</td>' +
                     '<td>' + esc(releaseDate) + '</td>' +
                     '<td>' + duration + '</td>' +
+                    '<td>' + (hasSlate === 'Yes' ? '<span class="badge badge-main">Yes</span>' : '<span class="badge badge-type" style="opacity:0.5">No</span>') + '</td>' +
                     '<td>' + (isMain ? '<span class="badge badge-main">Main</span> ' : '') + (isKey ? '<span class="badge badge-key">Key</span>' : '') + '</td>' +
                     '<td><div class="actions-cell">' +
                         '<button class="btn-icon edit-hidden" onclick="openEditModal(\'' + rowId + '\')" title="Edit">&#9998;</button>' +
                         '<button class="btn-icon delete edit-hidden" onclick="deleteVideo(\'' + rowId + '\')" title="Delete">&#128465;</button>' +
                     '</div></td></tr>' +
-                    '<tr class="detail-row" id="detailRow' + rowId + '"><td class="detail-cell" colspan="9"><div class="detail-panel"><div class="detail-grid">' + detailHtml + '</div></div></td></tr>';
+                    '<tr class="detail-row" id="detailRow' + rowId + '"><td class="detail-cell" colspan="10"><div class="detail-panel"><div class="detail-grid">' + detailHtml + '</div></div></td></tr>';
             }).join('');
         }
 
@@ -551,7 +578,7 @@
             else { currentSort.field = field; currentSort.order = 'asc'; }
             document.querySelectorAll('th').forEach(function(th) { th.classList.remove('active-sort'); });
             var headers = document.querySelectorAll('th');
-            var fieldMap = { 'Name': 0, 'Video Type': 1, 'Video Category': 2, 'Album': 3, 'Director': 4, 'Release Date (US)': 5, 'Duration (Seconds)': 6 };
+            var fieldMap = { 'Name': 0, 'Video Type': 1, 'Video Category': 2, 'Album': 3, 'Director': 4, 'Release Date (US)': 5, 'Duration (Seconds)': 6, 'Has Slate': 7 };
             var idx = fieldMap[field];
             if (headers[idx]) {
                 headers[idx].classList.add('active-sort');
@@ -598,6 +625,9 @@
                 document.getElementById('formIMDB').value = v.IMDB || '';
                 document.getElementById('formFinalReview').value = v['Final Review'] || '';
                 document.getElementById('formNote').value = v.Note || '';
+                document.getElementById('formHasSlate').value = v['Has Slate'] || '';
+                document.getElementById('formThumbnail').value = v['Thumbnail'] || '';
+                document.getElementById('thumbnailStatus').textContent = v['Thumbnail'] ? 'Current: ' + v['Thumbnail'] : '';
                 document.getElementById('videoModal').classList.add('active');
             } catch (err) { showToast('Error loading video details', 'error'); }
         }
@@ -609,9 +639,31 @@
              'formVideoType','formVideoCategory','formUnreleased','formDirector','formDP',
              'formProducer','formEditor','formAlbum','formDuration','formPostProduction',
              'formReleaseDate','formReleaseAccuracy','formRecordDate','formRecordLocation',
-             'formISRC','formIMDB','formFinalReview','formNote'];
+             'formISRC','formIMDB','formFinalReview','formNote','formHasSlate','formThumbnail'];
             ids.forEach(function(id) { document.getElementById(id).value = ''; });
+            document.getElementById('thumbnailStatus').textContent = '';
         }
+
+        // Thumbnail upload handler
+        document.getElementById('formThumbnailFile').addEventListener('change', async function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            var statusEl = document.getElementById('thumbnailStatus');
+            statusEl.textContent = 'Uploading...';
+            var formData = new FormData();
+            formData.append('file', file);
+            try {
+                var res = await fetch(API + '/upload-thumbnail', { method: 'POST', body: formData });
+                var result = await res.json();
+                if (result.error) { throw new Error(result.error); }
+                document.getElementById('formThumbnail').value = result.filename;
+                statusEl.textContent = 'Uploaded!';
+                showToast('Thumbnail uploaded!', 'success');
+            } catch (err) {
+                statusEl.textContent = 'Upload failed: ' + err.message;
+                showToast('Upload error: ' + err.message, 'error');
+            }
+        });
 
         async function saveVideo() {
             var editId = document.getElementById('editId').value;
@@ -640,7 +692,9 @@
                 'ISRC': document.getElementById('formISRC').value.trim(),
                 'IMDB': document.getElementById('formIMDB').value.trim(),
                 'Final Review': document.getElementById('formFinalReview').value.trim(),
-                'Note': document.getElementById('formNote').value.trim()
+                'Note': document.getElementById('formNote').value.trim(),
+                'Has Slate': document.getElementById('formHasSlate').value,
+                'Thumbnail': document.getElementById('formThumbnail').value.trim()
             };
             try {
                 var res;

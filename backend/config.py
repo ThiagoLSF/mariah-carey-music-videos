@@ -26,27 +26,28 @@ COLUMNS = [
     "Unreleased",                      # 5
     "Version Name",                    # 6
     "Introduction Name",               # 7
-    "Key Artist (dup)",                # 8 (duplicate column)
-    "Aliases",                         # 9
-    "Video Type",                      # 10
-    "Video Category",                  # 11
-    "Director",                        # 12
-    "Director of Photography",         # 13
-    "Producer",                        # 14
-    "Editor",                          # 15
-    "Post Production",                 # 16
-    "Release Date (US)",               # 17
-    "Release Date Accuracy",           # 18
-    "Release Date Estimated",          # 19
-    "Record Date",                     # 20
-    "Record Date Accuracy",            # 21
-    "Record Date Estimated",           # 22
-    "Record Location",                 # 23
-    "Duration (Seconds)",              # 24
-    "ISRC",                            # 25
-    "IMDB",                            # 26
-    "Note",                            # 27
-    "Album",                           # 28
+    "Aliases",                         # 8
+    "Video Type",                      # 9
+    "Video Category",                  # 10
+    "Director",                        # 11
+    "Director of Photography",         # 12
+    "Producer",                        # 13
+    "Editor",                          # 14
+    "Post Production",                 # 15
+    "Release Date (US)",               # 16
+    "Release Date Accuracy",           # 17
+    "Release Date Estimated",          # 18
+    "Record Date",                     # 19
+    "Record Date Accuracy",            # 20
+    "Record Date Estimated",           # 21
+    "Record Location",                 # 22
+    "Duration (Seconds)",              # 23
+    "ISRC",                            # 24
+    "IMDB",                            # 25
+    "Note",                            # 26
+    "Album",                           # 27
+    "Has Slate",                       # 28
+    "Thumbnail",                       # 29
 ]
 
 # Columns to display in the frontend table
@@ -64,6 +65,7 @@ DISPLAY_COLUMNS = [
     "Record Location",
     "IMDB",
     "Note",
+    "Has Slate",
 ]
 
 # Service account file path

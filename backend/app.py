@@ -21,9 +21,20 @@ if _backend_dir not in sys.path:
     sys.path.insert(0, _backend_dir)
 
 from google_sheets import get_all_videos, get_video_by_id, add_video, update_video, delete_video
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), "..", "frontend"))
 CORS(app)
+
+# Thumbnail upload configuration
+THUMBNAIL_FOLDER = os.path.join(os.path.dirname(__file__), "thumbnails")
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+MAX_THUMBNAIL_SIZE = 5 * 1024 * 1024  # 5MB
+os.makedirs(THUMBNAIL_FOLDER, exist_ok=True)
+
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Fields that can be searched/filtered
 SEARCH_FIELDS = ["Name", "Display Name", "Version Name", "Director", "Director of Photography",
@@ -245,6 +256,43 @@ def serve_frontend():
 def serve_static(path):
     """Serve static frontend files."""
     return send_from_directory(app.static_folder, path)
+
+
+# Thumbnail upload endpoint
+@app.route("/api/upload-thumbnail", methods=["POST"])
+def upload_thumbnail():
+    """Upload a thumbnail image for a music video."""
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+    file = request.files["file"]
+    if file.filename == "":
+        return jsonify({"error": "No file selected"}), 400
+    if not allowed_file(file.filename):
+        return jsonify({"error": f"File type not allowed. Allowed: {', '.join(ALLOWED_EXTENSIONS)}"}), 400
+    
+    # Read file content to check size
+    file.seek(0, os.SEEK_END)
+    size = file.tell()
+    file.seek(0)
+    if size > MAX_THUMBNAIL_SIZE:
+        return jsonify({"error": f"File too large. Max size: {MAX_THUMBNAIL_SIZE // (1024*1024)}MB"}), 400
+    
+    filename = secure_filename(file.filename)
+    # Add timestamp to avoid name conflicts
+    name, ext = os.path.splitext(filename)
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    filename = f"{name}_{timestamp}{ext}"
+    filepath = os.path.join(THUMBNAIL_FOLDER, filename)
+    file.save(filepath)
+    logger.info(f"Thumbnail saved: {filename}")
+    return jsonify({"filename": filename, "url": f"/api/thumbnails/{filename}"})
+
+
+# Serve thumbnail images
+@app.route("/api/thumbnails/<filename>")
+def serve_thumbnail(filename):
+    """Serve a thumbnail image."""
+    return send_from_directory(THUMBNAIL_FOLDER, filename)
 
 
 # Health check endpoint for Render
