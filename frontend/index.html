@@ -361,7 +361,11 @@
             if (currentSort.field) { params.set('sort', currentSort.field); params.set('order', currentSort.order); }
             try {
                 const res = await fetch(API + '/videos?' + params.toString());
-                if (!res.ok) throw new Error('Failed to load');
+                if (!res.ok) {
+                    let errMsg = 'Failed to load';
+                    try { const errData = await res.json(); errMsg = errData.error || errMsg; } catch(e) {}
+                    throw new Error(errMsg);
+                }
                 allVideos = await res.json();
                 renderTable(allVideos);
                 document.getElementById('totalCount').textContent = allVideos.length;

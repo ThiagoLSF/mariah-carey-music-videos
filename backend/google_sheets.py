@@ -6,8 +6,11 @@ Handles reading from and writing to the Google Sheet.
 import os
 import sys
 import json
+import logging
 import gspread
 from google.oauth2.service_account import Credentials
+
+logger = logging.getLogger(__name__)
 
 # Ensure backend directory is in path for imports
 _backend_dir = os.path.dirname(os.path.abspath(__file__))
@@ -19,26 +22,38 @@ from config import SPREADSHEET_ID, SHEET_NAME, SCOPES, COLUMNS, API_KEY_FILE
 
 def get_google_credentials():
     """Get Google Sheets API credentials from service account file."""
+    logger.info("Looking for Google credentials...")
+    logger.info(f"API_KEY_FILE path: {API_KEY_FILE}")
+    logger.info(f"File exists: {os.path.exists(API_KEY_FILE)}")
+    
     if os.path.exists(API_KEY_FILE):
         try:
             with open(API_KEY_FILE, "r") as f:
                 content = f.read().strip()
             if content.startswith("{"):
+                logger.info("Using service_account.json for credentials")
                 return Credentials.from_service_account_file(API_KEY_FILE, scopes=SCOPES)
-        except Exception:
-            pass
+            else:
+                logger.warning("service_account.json exists but does not start with '{'")
+        except Exception as e:
+            logger.warning(f"Failed to load service_account.json: {e}")
 
     # Try environment variable
     creds_json = os.environ.get("GOOGLE_CREDENTIALS")
+    logger.info(f"GOOGLE_CREDENTIALS env var present: {creds_json is not None}")
     if creds_json:
         try:
             creds_dict = json.loads(creds_json)
+            logger.info("Using GOOGLE_CREDENTIALS environment variable")
             return Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
-        except (json.JSONDecodeError, ValueError):
-            pass
+        except json.JSONDecodeError as e:
+            logger.error(f"GOOGLE_CREDENTIALS is not valid JSON: {e}")
+        except ValueError as e:
+            logger.error(f"GOOGLE_CREDENTIALS contains invalid credentials: {e}")
 
     raise Exception(
-        "Google credentials not found. Place service_account.json in the backend/ folder."
+        "Google credentials not found. Place service_account.json in the backend/ folder "
+        "or set the GOOGLE_CREDENTIALS environment variable."
     )
 
 
@@ -46,7 +61,9 @@ def get_sheet():
     """Get the Google Sheet worksheet."""
     creds = get_google_credentials()
     client = gspread.authorize(creds)
+    logger.info(f"Opening spreadsheet with ID: {SPREADSHEET_ID}")
     spreadsheet = client.open_by_key(SPREADSHEET_ID)
+    logger.info(f"Accessing sheet: {SHEET_NAME}")
     return spreadsheet.sheet1
 
 

@@ -6,9 +6,14 @@ Provides endpoints for searching, filtering, and managing music videos.
 import os
 import re
 import sys
+import logging
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Ensure backend directory is in path for imports
 _backend_dir = os.path.dirname(os.path.abspath(__file__))
@@ -241,6 +246,22 @@ def serve_static(path):
     """Serve static frontend files."""
     return send_from_directory(app.static_folder, path)
 
+
+# Health check endpoint for Render
+@app.route("/health")
+def health_check():
+    """Health check endpoint to verify the app is running."""
+    return jsonify({"status": "ok"})
+
+# Test Google Sheets connection at startup
+with app.app_context():
+    try:
+        logger.info("Testing Google Sheets connection at startup...")
+        test_videos = get_all_videos()
+        logger.info(f"Successfully connected to Google Sheets. Found {len(test_videos)} videos.")
+    except Exception as e:
+        logger.error(f"Failed to connect to Google Sheets at startup: {e}")
+        logger.error("The app will start but API endpoints may fail until credentials are configured.")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
