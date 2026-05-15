@@ -263,7 +263,7 @@
             <select class="filter-select" id="filterYear" onchange="loadVideos()"><option value="">All Years</option></select>
             <div class="controls-right">
                 <span class="result-count">Showing <strong id="shownCount">0</strong> results</span>
-                <button class="btn btn-gold edit-hidden" id="addVideoBtn" onclick="openAddModal()">+ Add Video</button>
+                <button class="btn btn-gold" id="addVideoBtn" onclick="openAddModal()">+ Add Video</button>
             </div>
         </div>
         <div class="table-wrapper">
@@ -278,7 +278,7 @@
                         <th class="col-director" onclick="sortBy('Director')">Director <span class="sort-arrow">&#9650;</span></th>
                         <th class="col-date" onclick="sortBy('Release Date (US)')">Release Date <span class="sort-arrow">&#9650;</span></th>
                         <th class="col-main">Main</th>
-                        <th class="col-actions edit-hidden">Actions</th>
+                        <th class="col-actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="videosTableBody"></tbody>
@@ -557,8 +557,8 @@
                     '<td>' + esc(releaseDate) + '</td>' +
                     '<td>' + (isMain ? '<span class="badge badge-main">Main</span> ' : '') + (isKey ? '<span class="badge badge-key">Key</span>' : '') + '</td>' +
                     '<td><div class="actions-cell">' +
-                        '<button class="btn-icon edit-hidden" onclick="openEditModal(\'' + rowId + '\')" title="Edit">&#9998;</button>' +
-                        '<button class="btn-icon delete edit-hidden" onclick="deleteVideo(\'' + rowId + '\')" title="Delete">&#128465;</button>' +
+                        '<button class="btn-icon" onclick="openEditModal(\'' + rowId + '\')" title="Edit">&#9998;</button>' +
+                        '<button class="btn-icon delete" onclick="deleteVideo(\'' + rowId + '\')" title="Delete">&#128465;</button>' +
                     '</div></td></tr>' +
                     '<tr class="detail-row" id="detailRow' + rowId + '"><td class="detail-cell" colspan="9"><div class="detail-panel"><div class="detail-grid">' + detailHtml + '</div></div></td></tr>';
             }).join('');
