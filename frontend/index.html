@@ -509,10 +509,10 @@
                 const hasSlate = v['Has Slate'] || '';
                 const isUnreleased = v.Unreleased === '1';
                 const thumbnail = v['Thumbnail'] || '';
-                // Thumbnail HTML
+                // Thumbnail HTML - use CDN URL directly from spreadsheet
                 var thumbHtml = '';
                 if (thumbnail) {
-                    thumbHtml = '<img class="video-thumb" src="' + API + '/thumbnails/' + encodeURIComponent(thumbnail) + '" alt="' + esc(name) + '" loading="lazy" onerror="this.style.display=\'none\'"> ';
+                    thumbHtml = '<img class="video-thumb" src="' + esc(thumbnail) + '" alt="' + esc(name) + '" loading="lazy" onerror="this.style.display=\'none\'"> ';
                 }
                 // Build detail panel fields (all columns)
                 var detailFields = [

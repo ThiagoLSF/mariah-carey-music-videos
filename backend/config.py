@@ -18,9 +18,9 @@ SCOPES = [
 # Full column mapping (based on the actual spreadsheet structure)
 # Index positions match the sheet columns (0-based)
 COLUMNS = [
-    "Final Review",                    # 0
-    "Name",                            # 1
-    "Has Slate",                       # 2
+    "Name",                            # 0
+    "Has Slate",                       # 1
+    "Thumbnail",                       # 2
     "Key Artist",                      # 3
     "Main Video",                      # 4
     "Key Video",                       # 5
