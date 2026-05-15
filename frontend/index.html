@@ -153,9 +153,17 @@
         td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
         tr:hover td { background: rgba(212,168,83,0.03); }
         tr:last-child td { border-bottom: none; }
-        .video-name { font-weight: 600; color: var(--gold-light); white-space: nowrap; }
+        .video-name { font-weight: 600; color: var(--gold-light); white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
         .video-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); flex-shrink: 0; }
         .thumb-cell { width: 52px; text-align: center; vertical-align: middle; }
+        .col-name { min-width: 140px; max-width: 220px; }
+        .col-slate { width: 60px; text-align: center; }
+        .col-category { min-width: 100px; }
+        .col-album { min-width: 120px; }
+        .col-director { min-width: 120px; }
+        .col-date { min-width: 110px; }
+        .col-main { width: 70px; text-align: center; }
+        .col-actions { width: 80px; }
         .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 500; }
         .badge-type { background: rgba(212,168,83,0.1); border: 1px solid rgba(212,168,83,0.2); color: var(--gold); }
         .badge-category { background: rgba(100,180,255,0.1); border: 1px solid rgba(100,180,255,0.2); color: #7ab8ff; }
@@ -272,15 +280,15 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Thumb</th>
-                        <th onclick="sortBy('Name')">Name <span class="sort-arrow">&#9650;</span></th>
-                        <th onclick="sortBy('Has Slate')">Slate <span class="sort-arrow">&#9650;</span></th>
-                        <th onclick="sortBy('Video Category')">Category <span class="sort-arrow">&#9650;</span></th>
-                        <th onclick="sortBy('Album')">Album <span class="sort-arrow">&#9650;</span></th>
-                        <th onclick="sortBy('Director')">Director <span class="sort-arrow">&#9650;</span></th>
-                        <th onclick="sortBy('Release Date (US)')">Release Date <span class="sort-arrow">&#9650;</span></th>
-                        <th>Main</th>
-                        <th class="edit-hidden">Actions</th>
+                        <th class="col-thumb">Thumb</th>
+                        <th class="col-name" onclick="sortBy('Name')">Name <span class="sort-arrow">&#9650;</span></th>
+                        <th class="col-slate" onclick="sortBy('Has Slate')">Slate <span class="sort-arrow">&#9650;</span></th>
+                        <th class="col-category" onclick="sortBy('Video Category')">Category <span class="sort-arrow">&#9650;</span></th>
+                        <th class="col-album" onclick="sortBy('Album')">Album <span class="sort-arrow">&#9650;</span></th>
+                        <th class="col-director" onclick="sortBy('Director')">Director <span class="sort-arrow">&#9650;</span></th>
+                        <th class="col-date" onclick="sortBy('Release Date (US)')">Release Date <span class="sort-arrow">&#9650;</span></th>
+                        <th class="col-main">Main</th>
+                        <th class="col-actions edit-hidden">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="videosTableBody"></tbody>

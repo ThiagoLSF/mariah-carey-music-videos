@@ -246,18 +246,6 @@ def get_filter_options():
     return jsonify(filter_data)
 
 
-@app.route("/")
-def serve_frontend():
-    """Serve the frontend index.html."""
-    return send_from_directory(app.static_folder, "index.html")
-
-
-@app.route("/<path:path>")
-def serve_static(path):
-    """Serve static frontend files."""
-    return send_from_directory(app.static_folder, path)
-
-
 # Thumbnail upload endpoint
 @app.route("/api/upload-thumbnail", methods=["POST"])
 def upload_thumbnail():
@@ -293,6 +281,18 @@ def upload_thumbnail():
 def serve_thumbnail(filename):
     """Serve a thumbnail image."""
     return send_from_directory(THUMBNAIL_FOLDER, filename)
+
+
+@app.route("/")
+def serve_frontend():
+    """Serve the frontend index.html."""
+    return send_from_directory(app.static_folder, "index.html")
+
+
+@app.route("/<path:path>")
+def serve_static(path):
+    """Serve static frontend files."""
+    return send_from_directory(app.static_folder, path)
 
 
 # Health check endpoint for Render
