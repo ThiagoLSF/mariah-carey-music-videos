@@ -181,6 +181,8 @@
             display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 0.6rem 1.5rem;
         }
+        .detail-thumb { grid-column: 1 / -1; margin-bottom: 0.5rem; }
+        .detail-thumb img { width: 100%; max-width: 320px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
         .detail-item { display: flex; flex-direction: column; gap: 0.15rem; }
         .detail-item .label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
         .detail-item .value { font-size: 0.85rem; color: var(--text); word-break: break-word; }
@@ -543,7 +545,12 @@
                     { label: 'Unreleased', value: v.Unreleased === '1' ? 'Yes' : 'No' },
                     { label: 'Has Slate', value: hasSlate || 'No' }
                 ];
-                var detailHtml = detailFields.map(function(f) {
+                // Add thumbnail as first item in detail panel if available
+                var detailThumbHtml = '';
+                if (thumbnail) {
+                    detailThumbHtml = '<div class="detail-thumb"><img src="' + esc(thumbnail) + '" alt="' + esc(name) + '" loading="lazy" onerror="this.style.display=\'none\'"></div>';
+                }
+                var detailHtml = detailThumbHtml + detailFields.map(function(f) {
                     var val = f.value && f.value !== '-' ? esc(f.value) : '<span class="empty">—</span>';
                     return '<div class="detail-item"><span class="label">' + esc(f.label) + '</span><span class="value">' + val + '</span></div>';
                 }).join('');
