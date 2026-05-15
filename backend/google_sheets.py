@@ -135,11 +135,27 @@ def update_video(video_id, video_data):
     if row_idx < 1 or row_idx >= len(all_values):
         return {"error": f"Video with ID {video_id} not found"}, 404
 
-    # Update each provided field
+    # Get the current row values
+    current_row = all_values[row_idx]
+
+    # Build updated row by applying changes on top of current values
+    updated_row = list(current_row)
     for col_name, value in video_data.items():
         if col_name in headers:
             col_idx = headers.index(col_name)
-            sheet.update_cell(row_idx + 1, col_idx + 1, str(value))
+            # Extend row if needed
+            while len(updated_row) <= col_idx:
+                updated_row.append("")
+            updated_row[col_idx] = str(value)
+
+    # Batch update the entire row at once
+    # Use gspread's 1-based (row, col) range format
+    end_col = len(updated_row)
+    # gspread's update accepts a list of lists with a cell_list or range
+    cell_list = sheet.range(row_idx + 1, 1, row_idx + 1, end_col)
+    for i, cell in enumerate(cell_list):
+        cell.value = updated_row[i] if i < len(updated_row) else ""
+    sheet.update_cells(cell_list)
 
     return {"message": f"Video {video_id} updated successfully"}
 

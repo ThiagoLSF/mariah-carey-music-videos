@@ -791,18 +791,15 @@
 
         function updateLockUI() {
             var btn = document.getElementById('lockBtn');
-            var span = btn.querySelector('span');
             var elements = document.querySelectorAll('.edit-hidden');
             if (isUnlocked) {
                 btn.classList.add('unlocked');
                 btn.title = 'Lock editing';
-                span.textContent = 'Unlocked';
                 btn.innerHTML = '🔓 <span>Unlocked</span>';
                 elements.forEach(function(el) { el.classList.remove('edit-hidden'); });
             } else {
                 btn.classList.remove('unlocked');
                 btn.title = 'Unlock to edit';
-                span.textContent = 'Locked';
                 btn.innerHTML = '🔒 <span>Locked</span>';
                 elements.forEach(function(el) { el.classList.add('edit-hidden'); });
             }
