@@ -61,11 +61,12 @@
         .header .credit a { color: var(--text-muted); text-decoration: none; transition: var(--transition); }
         .header .credit a:hover { color: var(--gold); opacity: 1; }
         .header .lock-btn {
-            position: absolute; top: 1rem; right: 1.5rem;
-            background: transparent; border: 1px solid var(--border); border-radius: 6px;
+            position: fixed; top: 1rem; right: 1.5rem; z-index: 100;
+            background: var(--dark-card); border: 1px solid var(--border); border-radius: 6px;
             color: var(--text-muted); cursor: pointer; padding: 0.4rem 0.7rem;
             font-size: 0.8rem; transition: var(--transition);
             display: flex; align-items: center; gap: 0.35rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
         .header .lock-btn:hover { border-color: var(--gold); color: var(--gold); }
         .header .lock-btn.unlocked { border-color: var(--gold); color: var(--gold); background: rgba(212,168,83,0.1); }
@@ -423,8 +424,6 @@
         let searchTimeout = null;
         const API = window.location.origin + '/api';
 
-        document.addEventListener('DOMContentLoaded', () => { loadVideos(); loadFilterOptions(); });
-
         async function loadVideos() {
             const params = new URLSearchParams();
             const search = document.getElementById('searchInput').value.trim();
@@ -753,12 +752,13 @@
 
         // Password protection for editing
         const EDIT_PASSWORD = 'butiloveyouallthesame';
-        let isUnlocked = false;
+        let isUnlocked = localStorage.getItem('mcUnlocked') === 'true';
 
         function toggleLock() {
             if (isUnlocked) {
                 // Lock it back
                 isUnlocked = false;
+                localStorage.removeItem('mcUnlocked');
                 updateLockUI();
             } else {
                 // Show password modal
@@ -773,6 +773,7 @@
             var pwd = document.getElementById('passwordInput').value;
             if (pwd === EDIT_PASSWORD) {
                 isUnlocked = true;
+                localStorage.setItem('mcUnlocked', 'true');
                 document.getElementById('passwordModal').classList.remove('active');
                 updateLockUI();
                 showToast('Editing unlocked!', 'success');
@@ -806,6 +807,13 @@
                 elements.forEach(function(el) { el.classList.add('edit-hidden'); });
             }
         }
+
+        // Apply saved unlock state on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isUnlocked) updateLockUI();
+            loadVideos();
+            loadFilterOptions();
+        });
 
         // Close password modal on overlay click
         document.getElementById('passwordModal').addEventListener('click', function(e) {
