@@ -60,6 +60,41 @@
         .header .credit { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; opacity: 0.6; }
         .header .credit a { color: var(--text-muted); text-decoration: none; transition: var(--transition); }
         .header .credit a:hover { color: var(--gold); opacity: 1; }
+        .header .lock-btn {
+            position: absolute; top: 1rem; right: 1.5rem;
+            background: transparent; border: 1px solid var(--border); border-radius: 6px;
+            color: var(--text-muted); cursor: pointer; padding: 0.4rem 0.7rem;
+            font-size: 0.8rem; transition: var(--transition);
+            display: flex; align-items: center; gap: 0.35rem;
+        }
+        .header .lock-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .header .lock-btn.unlocked { border-color: var(--gold); color: var(--gold); background: rgba(212,168,83,0.1); }
+        .password-modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1500;
+            align-items: center; justify-content: center; padding: 1rem;
+        }
+        .password-modal-overlay.active { display: flex; }
+        .password-modal {
+            background: var(--dark-card); border: 1px solid var(--border);
+            border-radius: var(--radius); width: 100%; max-width: 380px;
+            box-shadow: var(--shadow); animation: modalIn 0.25s ease-out;
+            padding: 2rem; text-align: center;
+        }
+        .password-modal .lock-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .password-modal h3 { font-size: 1.1rem; color: var(--text); margin-bottom: 0.3rem; }
+        .password-modal p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.25rem; }
+        .password-modal input {
+            width: 100%; padding: 0.65rem 0.85rem; background: var(--dark-soft);
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            color: var(--text); font-size: 0.9rem; transition: var(--transition);
+            font-family: 'Inter', sans-serif; text-align: center; margin-bottom: 1rem;
+        }
+        .password-modal input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,168,83,0.15); }
+        .password-modal .error-msg { font-size: 0.78rem; color: #e74c5e; margin-bottom: 0.75rem; display: none; }
+        .password-modal .error-msg.show { display: block; }
+        .password-modal .btn-row { display: flex; gap: 0.5rem; justify-content: center; }
+        .edit-hidden { display: none !important; }
         .container { max-width: 1500px; margin: 0 auto; padding: 1.5rem 2rem; }
         .controls-bar {
             display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;
@@ -213,6 +248,7 @@
         <h1>✦ Mariah Carey</h1>
         <p class="subtitle">Music Videos Database — <span id="totalCount">0</span> videos</p>
         <p class="credit">Developed by <a href="https://www.instagram.com/themariahstation/" target="_blank" rel="noopener">Mariah Station</a></p>
+        <button class="lock-btn" id="lockBtn" onclick="toggleLock()" title="Unlock to edit">🔒 <span>Locked</span></button>
     </header>
     <div class="container">
         <div class="controls-bar">
@@ -227,7 +263,7 @@
             <select class="filter-select" id="filterYear" onchange="loadVideos()"><option value="">All Years</option></select>
             <div class="controls-right">
                 <span class="result-count">Showing <strong id="shownCount">0</strong> results</span>
-                <button class="btn btn-gold" onclick="openAddModal()">+ Add Video</button>
+                <button class="btn btn-gold edit-hidden" id="addVideoBtn" onclick="openAddModal()">+ Add Video</button>
             </div>
         </div>
         <div class="table-wrapper">
@@ -242,11 +278,26 @@
                         <th onclick="sortBy('Release Date (US)')">Release Date <span class="sort-arrow">&#9650;</span></th>
                         <th onclick="sortBy('Duration (Seconds)')">Duration <span class="sort-arrow">&#9650;</span></th>
                         <th>Main</th>
-                        <th>Actions</th>
+                        <th class="edit-hidden">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="videosTableBody"></tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Password Modal -->
+    <div class="password-modal-overlay" id="passwordModal">
+        <div class="password-modal">
+            <div class="lock-icon">🔒</div>
+            <h3>Unlock Editing</h3>
+            <p>Enter the password to add, edit, or delete videos.</p>
+            <input type="password" id="passwordInput" placeholder="Enter password" onkeydown="if(event.key==='Enter') checkPassword()">
+            <div class="error-msg" id="passwordError">Incorrect password. Try again.</div>
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="closePasswordModal()">Cancel</button>
+                <button class="btn btn-gold" onclick="checkPassword()">Unlock</button>
+            </div>
         </div>
     </div>
 
@@ -484,8 +535,8 @@
                     '<td>' + duration + '</td>' +
                     '<td>' + (isMain ? '<span class="badge badge-main">Main</span> ' : '') + (isKey ? '<span class="badge badge-key">Key</span>' : '') + '</td>' +
                     '<td><div class="actions-cell">' +
-                        '<button class="btn-icon" onclick="openEditModal(\'' + rowId + '\')" title="Edit">&#9998;</button>' +
-                        '<button class="btn-icon delete" onclick="deleteVideo(\'' + rowId + '\')" title="Delete">&#128465;</button>' +
+                        '<button class="btn-icon edit-hidden" onclick="openEditModal(\'' + rowId + '\')" title="Edit">&#9998;</button>' +
+                        '<button class="btn-icon delete edit-hidden" onclick="deleteVideo(\'' + rowId + '\')" title="Delete">&#128465;</button>' +
                     '</div></td></tr>' +
                     '<tr class="detail-row" id="detailRow' + rowId + '"><td class="detail-cell" colspan="9"><div class="detail-panel"><div class="detail-grid">' + detailHtml + '</div></div></td></tr>';
             }).join('');
@@ -637,6 +688,67 @@
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeModal();
+        });
+
+        // Password protection for editing
+        const EDIT_PASSWORD = 'butiloveyouallthesame';
+        let isUnlocked = false;
+
+        function toggleLock() {
+            if (isUnlocked) {
+                // Lock it back
+                isUnlocked = false;
+                updateLockUI();
+            } else {
+                // Show password modal
+                document.getElementById('passwordModal').classList.add('active');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordError').classList.remove('show');
+                setTimeout(function() { document.getElementById('passwordInput').focus(); }, 100);
+            }
+        }
+
+        function checkPassword() {
+            var pwd = document.getElementById('passwordInput').value;
+            if (pwd === EDIT_PASSWORD) {
+                isUnlocked = true;
+                document.getElementById('passwordModal').classList.remove('active');
+                updateLockUI();
+                showToast('Editing unlocked!', 'success');
+            } else {
+                document.getElementById('passwordError').classList.add('show');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+            }
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.remove('active');
+            document.getElementById('passwordError').classList.remove('show');
+        }
+
+        function updateLockUI() {
+            var btn = document.getElementById('lockBtn');
+            var span = btn.querySelector('span');
+            var elements = document.querySelectorAll('.edit-hidden');
+            if (isUnlocked) {
+                btn.classList.add('unlocked');
+                btn.title = 'Lock editing';
+                span.textContent = 'Unlocked';
+                btn.innerHTML = '🔓 <span>Unlocked</span>';
+                elements.forEach(function(el) { el.classList.remove('edit-hidden'); });
+            } else {
+                btn.classList.remove('unlocked');
+                btn.title = 'Unlock to edit';
+                span.textContent = 'Locked';
+                btn.innerHTML = '🔒 <span>Locked</span>';
+                elements.forEach(function(el) { el.classList.add('edit-hidden'); });
+            }
+        }
+
+        // Close password modal on overlay click
+        document.getElementById('passwordModal').addEventListener('click', function(e) {
+            if (e.target === this) closePasswordModal();
         });
     </script>
 </body>
