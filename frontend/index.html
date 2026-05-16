@@ -48,13 +48,16 @@
             background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
         }
         .header h1 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Largo BEF', 'Playfair Display', serif;
             font-weight: 900;
             font-size: 2.5rem;
             color: var(--gold);
             letter-spacing: -0.5px;
             margin-bottom: 0.25rem;
+            cursor: pointer;
+            transition: var(--transition);
         }
+        .header h1:hover { opacity: 0.8; }
         .header .subtitle { font-size: 0.95rem; color: var(--text-muted); font-weight: 300; }
         .header .subtitle span { color: var(--gold); font-weight: 600; }
         .header .credit { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; opacity: 0.6; }
@@ -248,7 +251,7 @@
 </head>
 <body>
     <header class="header">
-        <h1>✦ Mariah Carey</h1>
+        <h1 onclick="resetFilters()">✦ Mariah Carey</h1>
         <p class="subtitle">Music Videos Database — <span id="totalCount">0</span> videos</p>
         <p class="credit">Developed by <a href="https://www.instagram.com/themariahstation/" target="_blank" rel="noopener">Mariah Station</a></p>
     </header>
@@ -264,6 +267,7 @@
             <select class="filter-select" id="filterAlbum" onchange="loadVideos()"><option value="">All Albums</option></select>
             <select class="filter-select" id="filterYear" onchange="loadVideos()"><option value="">All Years</option></select>
             <div class="controls-right">
+                <button class="btn btn-outline" id="backBtn" onclick="resetFilters()" style="display:none">&#8592; Back</button>
                 <span class="result-count">Showing <strong id="shownCount">0</strong> results</span>
                 <!-- Add Video button removed - edit via spreadsheet only -->
             </div>
@@ -440,6 +444,9 @@
                 allVideos = await res.json();
                 renderTable(allVideos);
                 document.getElementById('totalCount').textContent = allVideos.length;
+                // Show back button when filters/search are active
+                var hasFilters = search || videoType || videoCategory || director || album || year;
+                document.getElementById('backBtn').style.display = hasFilters ? 'inline-flex' : 'none';
             } catch (err) { showToast('Error: ' + err.message, 'error'); }
         }
 
@@ -567,6 +574,20 @@
         }
 
         function esc(t) { if (!t) return ''; var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.querySelectorAll('.filter-select').forEach(function(s) { s.selectedIndex = 0; });
+            currentSort = { field: 'Name', order: 'asc' };
+            document.querySelectorAll('th').forEach(function(th) { th.classList.remove('active-sort'); });
+            var nameHeader = document.querySelector('th.col-name');
+            if (nameHeader) {
+                nameHeader.classList.add('active-sort');
+                var arrow = nameHeader.querySelector('.sort-arrow');
+                if (arrow) arrow.innerHTML = '&#9650;';
+            }
+            loadVideos();
+        }
 
         function debounceSearch() { clearTimeout(searchTimeout); searchTimeout = setTimeout(loadVideos, 300); }
 
