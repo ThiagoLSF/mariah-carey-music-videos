@@ -289,6 +289,12 @@ def serve_frontend():
     return send_from_directory(app.static_folder, "index.html")
 
 
+@app.route("/style/<path:filename>")
+def serve_style(filename):
+    """Serve files from the style directory (fonts, etc.)."""
+    style_dir = os.path.join(os.path.dirname(__file__), "..", "style")
+    return send_from_directory(style_dir, filename)
+
 @app.route("/<path:path>")
 def serve_static(path):
     """Serve static frontend files. Only match non-API paths."""
