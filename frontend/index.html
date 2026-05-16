@@ -507,7 +507,6 @@
                 const releaseDate = v['Release Date (US)'] || '-';
                 const duration = formatDuration(v['Duration (Seconds)']);
                 const isMain = v['Main Video'] === '1';
-                const isKey = v['Key Video'] === '1';
                 const hasSlate = v['Has Slate'] || '';
                 const isUnreleased = v.Unreleased === '1';
                 const thumbnail = v['Thumbnail'] || '';
@@ -541,7 +540,6 @@
                     { label: 'Note', value: v.Note },
                     { label: 'Key Artist', value: v['Key Artist'] },
                     { label: 'Main Video', value: isMain ? 'Yes' : 'No' },
-                    { label: 'Key Video', value: isKey ? 'Yes' : 'No' },
                     { label: 'Unreleased', value: v.Unreleased === '1' ? 'Yes' : 'No' },
                     { label: 'Has Slate', value: hasSlate || 'No' }
                 ];
@@ -562,7 +560,7 @@
                     '<td>' + esc(album) + '</td>' +
                     '<td>' + esc(director) + '</td>' +
                     '<td>' + esc(releaseDate) + '</td>' +
-                    '<td>' + (isMain ? '<span class="badge badge-main">Main</span> ' : '') + (isKey ? '<span class="badge badge-key">Key</span>' : '') + '</td>' +
+                    '<td>' + (isMain ? '<span class="badge badge-main">Main</span>' : '') + '</td>' +
                     '<td>' + (isUnreleased ? '<span class="badge badge-type">No</span>' : '<span class="badge badge-main">Yes</span>') + '</td></tr>' +
                     '<tr class="detail-row" id="detailRow' + rowId + '"><td class="detail-cell" colspan="9"><div class="detail-panel"><div class="detail-grid">' + detailHtml + '</div></div></td></tr>';
             }).join('');
