@@ -289,17 +289,19 @@ def serve_frontend():
     return send_from_directory(app.static_folder, "index.html")
 
 
-@app.route("/style/<path:filename>")
-def serve_style(filename):
-    """Serve files from the style directory (fonts, etc.)."""
-    style_dir = os.path.join(os.path.dirname(__file__), "..", "style")
-    return send_from_directory(style_dir, filename)
-
 @app.route("/<path:path>")
 def serve_static(path):
     """Serve static frontend files. Only match non-API paths."""
     if path.startswith("api/"):
         return jsonify({"error": "Not found"}), 404
+    # Check if the file exists in the style directory
+    style_dir = os.path.join(os.path.dirname(__file__), "..", "style")
+    # Strip 'style/' prefix since the URL already includes it
+    if path.startswith("style/"):
+        filename = path[len("style/"):]
+        style_path = os.path.join(style_dir, filename)
+        if os.path.exists(style_path) and os.path.isfile(style_path):
+            return send_from_directory(style_dir, filename)
     return send_from_directory(app.static_folder, path)
 
 
